@@ -1,0 +1,48 @@
+<html>
+<head>
+<style>
+body {
+  min-width:357px;
+  overflow-x:hidden;
+}
+
+img {
+  margin:5px;
+  border:2px solid black;
+  vertical-align:middle;
+  width:75px;
+  height:75px;
+}
+</style>
+<title></title>
+<script>
+  function main() {
+      chrome.tabs.getSelected(null, function(tab) {
+          console.debug( tab );
+          /*
+          TabPage Object : {
+            id: 30
+            index: 5
+            selected: true
+            status: "loading"
+            title: "Hey"
+            url: "chrome-extension://obihdpcefdjkokcdccdigklogeifnohk/popup.html"
+            windowId: 1 }
+            */
+      });
+  }
+
+  // On Linux, popups aren't supported yet.
+  chrome.pageAction.onClicked.addListener(function(tab) {
+    chrome.windows.get(tab.windowId, function(window) {
+      if (window.focused) {
+        //var url = "subscribe.html?" + encodeURIComponent(feedData[tab.id][0].href);
+        //chrome.tabs.create({url: url, windowId: window.id});
+      }
+    });
+  });
+</script>
+</head>
+<body onload="main();">
+</body>
+</html>

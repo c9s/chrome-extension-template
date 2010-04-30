@@ -1,0 +1,62 @@
+<html>
+    <head>
+    <script type="text/javascript" charset="utf-8">
+
+
+    // load jquery src when runtime.
+    var e = document.createElement( 'script' );
+    e.src = chrome.extension.getURL( 'js/jquery-1.4.2.min.js' );
+    e.type = 'text/javascript';
+    document.getElementsByTagName("head")[0].appendChild(e); 
+
+    function saved(msg) {
+        if( !msg )
+            msg = 'Options saved.';
+        // Update status to let user know options were saved.
+        var status = $("#status");
+        status.html( msg );
+        status.show().fadeOut(900);
+    }
+
+
+    // Saves options to localStorage.
+    function save_options() {
+        saved();
+
+    }
+
+    // Restores select box state to saved value from localStorage.
+    function restore_options() {
+        console.log( data );
+    }
+
+
+    function reset() {
+        saved();
+    }
+
+
+    </script>
+    <style type="text/css" media="screen">
+        #status { 
+            display: none;
+            padding: 6px; margin:12px;
+            border:1px solid #153E7E ;
+            background: #5CB3FF;
+        }
+
+    </style>
+    </head>
+
+    <body onload="restore_options()">
+
+    <button onclick="reset();">Reset</button>
+
+<!--
+    Mute Keywords:
+    <input type="text" size="20" value="" id="mute_keywords">
+    <button onclick="save_options()">Save</button>        
+-->
+    <div id="status"></div>
+    </body>
+</html>

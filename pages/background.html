@@ -1,136 +1,88 @@
 <html>
 <!-- 
-  vim:fdm=marker:fdl=0: 
+  vim:fdm=marker:fdl=0:
 -->
+<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="js/xhr-helper.js"></script>
 <script type="text/javascript">
-// HELPERS {{{
+(function() { 
+    // HELPERS {{{
 
-/*
- send request to context script.
-
-    chrome.tabs.getSelected(null, function(tab) {
-        chrome.tabs.sendRequest(tab.id, {greeting: "hello"}, function(response) {
-            console.log(response.farewell);
+    /*
+    send request to context script.
+        chrome.tabs.getSelected(null, function(tab) {
+            chrome.tabs.sendRequest(tab.id, {greeting: "hello"}, function(response) {
+                console.log(response.farewell);
+            });
         });
+    */
+
+    var __handler =  { };
+    var extHook = function(eventName,callback) {
+        __handler[  eventName ] = callback ;
+    };
+
+    var extURL = function( url ) {
+        return chrome.extension.getURL( url );
+    };
+    // }}}
+    // EVENT HANDLERS {{{
+    extHook( 'eventName' , function(e,ender,sendResponse) {
+        var on  = localStorage[  'blah' ];
+        sendResponse({ succ: 1 });
     });
-*/
 
-var __handler =  { };
-var extHook = function(eventName,callback) {
-    __handler[  eventName ] = callback ;
-};
-
-var extURL = function( url ) {
-    return chrome.extension.getURL( url );
-};
-
-// XHR HELPERS {{{
-var XHR = {};
-XHR.requestXML = function( url, options ) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url , true);
-    xhr.send();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4) {
-        var resp = xhr.responseXML;
-        options.finish(resp);
-        }
-    }
-};
-
-XHR.requestJSON = function(url,options) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url , true);
-    xhr.send();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4) {
-        var resp = JSON.parse(xhr.responseText);
-        options.finish(resp);
-        }
-    }
-};
-// }}}
-// }}}
-// EVENT HANDLERS {{{
-extHook( 'fetch-flickr-images' , function(e,sender,sendResponse) {
-    // XXX: a general xml request api 
-    xhr_request_xml( e.data , { 
-        finish: function(xml) {
-            var photos = xml.getElementsByTagName("photo");
-            function constructImageURL(photo) {
-                return "http://farm" + photo.getAttribute("farm") +
-                    ".static.flickr.com/" + photo.getAttribute("server") +
-                    "/" + photo.getAttribute("id") +
-                    "_" + photo.getAttribute("secret") +
-                    "_s.jpg";
-            }
-            var div = document.createElement('div');
-            for (var i = 0, photo; photo = photos[i]; i++) {
-                var img = document.createElement("image");
-                img.src = constructImageURL(photo);
-                div.appendChild( img );
-            }
-            sendResponse({ html: div.innerHTML });
-        }
+    extHook( 'tabs-create' , function(e,sender,sendResponse) {
+        chrome.tabs.create({ url: e.data });
     });
-});
-
-extHook( 'eventName' , function(e,ender,sendResponse) {
-    var on  = localStorage[  'blah' ];
-    sendResponse({ succ: 1 });
-});
-
-extHook( 'tabs-create' , function(e,sender,sendResponse) {
-    chrome.tabs.create({ url: e.data });
-});
 
 
-/* 
-   Tab data:
-		tab:
-			favIconUrl: "http://www.google.com/favicon.ico"
-			id: 453
-			incognito: false
-			index: 4
-			selected: true
-			status: "complete"
-			title: "Google"
-			url: "http://www.google.com/"
-			windowId: 356
-						*/
+    /* 
+    Tab data:
+            tab:
+                favIconUrl: "http://www.google.com/favicon.ico"
+                id: 453
+                incognito: false
+                index: 4
+                selected: true
+                status: "complete"
+                title: "Google"
+                url: "http://www.google.com/"
+                windowId: 356
+                            */
 
-/*
-	chrome.tabs.getAllInWindow( null , function(tabs){ 
-		for (var i = 0, t = tabs[0]; t = tabs[i]; i++) {
-			if (!t.selected) {
-				console.log("Send request to tab: ", t);
-				chrome.tabs.sendRequest(t.id, { action: 'blah' },
-					function() {});
-			}
-		}
-	});
-*/
+    /*
+        chrome.tabs.getAllInWindow( null , function(tabs){ 
+            for (var i = 0, t = tabs[0]; t = tabs[i]; i++) {
+                if (!t.selected) {
+                    console.log("Send request to tab: ", t);
+                    chrome.tabs.sendRequest(t.id, { action: 'blah' },
+                        function() {});
+                }
+            }
+        });
+    */
 
 
-// }}}
-// CHROME REQUEST HANDLER {{{
-chrome.extension.onRequest.addListener(
-    function(request, sender, sendResponse) {
-        if( request.name ) {
-            var h = handler[ request.name ];
-            if( h )
-                h( request , sender , sendResponse );
-            else
-                console.error( "Unknown Event" , request , sender );
-        }
-});
-// }}}
-// CHROME BROWSER ACTION:  react when a browser action's icon is clicked. {{{
-chrome.browserAction.onClicked.addListener(function(tab) {
+    // }}}
+    // CHROME REQUEST HANDLER {{{
+    chrome.extension.onRequest.addListener(
+        function(request, sender, sendResponse) {
+            if( request.name ) {
+                var h = handler[ request.name ];
+                if( h )
+                    h( request , sender , sendResponse );
+                else
+                    console.error( "Unknown Event" , request , sender );
+            }
+    });
+    // }}}
+    // CHROME BROWSER ACTION:  react when a browser action's icon is clicked. {{{
+    chrome.browserAction.onClicked.addListener(function(tab) {
 
-});
+    });
 
-// }}}
-
-  </script>
+    // }}}
+})();
+</script>
 </html>
